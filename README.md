@@ -8,6 +8,8 @@ For example:
     require 'resque/plugins/priority'
     
     class Job
+      extend Resque::Plugins::Priority
+
       @queue = :primary
 
       def self.perform(record)

@@ -9,7 +9,7 @@ module Resque
     Resque::Job.create(queue, klass, *args)
   end
 
-  module Plugin
+  module Plugins
     module Priority
       def priority=(p)
         if [:high, :low].include?(p.to_sym)
