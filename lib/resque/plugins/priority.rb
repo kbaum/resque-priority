@@ -12,6 +12,7 @@ module Resque
   module Plugins
     module Priority
       def priority=(p)
+        @queue_without_priority ||= @queue
         if [:high, :low].include?(p.to_sym)
           @queue = "#{@queue}_#{p}".to_sym
         end
@@ -35,6 +36,8 @@ module Resque
           yield
         ensure
           Resque.redis.del(key)
+          @queue = @queue_without_priority
+          @priority = nil
         end
       end
     end
