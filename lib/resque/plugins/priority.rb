@@ -5,6 +5,7 @@ module Resque
     if [:high, :low].include?(priority.to_sym)
       queue = "#{queue}_#{priority}".to_sym
     end
+
     klass.priority = priority
     Resque::Job.create(queue, klass, *args)
   end
@@ -12,15 +13,15 @@ module Resque
   module Plugins
     module Priority
       def priority=(p)
-        @queue_without_priority ||= @queue
-        if [:high, :low].include?(p.to_sym)
-          @queue = "#{@queue}_#{p}".to_sym
-        end
         @priority = p.to_sym
       end
 
+      def priority_identifier(*args)
+        args.join('-')
+      end
+
       def priority_key(*args)
-        "priority:#{name}-#{args.to_s}"
+        ['priority', 'name', priority_identifier(*args)].compact.join(':')
       end
       
       def after_enqueue_set_priority(*args)
@@ -36,8 +37,6 @@ module Resque
           yield
         ensure
           Resque.redis.del(key)
-          @queue = @queue_without_priority
-          @priority = nil
         end
       end
     end
