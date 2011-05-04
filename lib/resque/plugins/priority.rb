@@ -8,6 +8,7 @@ module Resque
 
     klass.priority = priority
     Resque::Job.create(queue, klass, *args)
+    Resque.redis.setnx(klass.priority_key(*args), priority)
   end
 
   module Plugins
@@ -24,9 +25,6 @@ module Resque
         ['priority', 'name', priority_identifier(*args)].compact.join(':')
       end
       
-      def after_enqueue_set_priority(*args)
-        Resque.redis.setnx(priority_key(*args), @priority)
-      end
 
       def around_perform_retrieve_priority(*args)
         key = priority_key(*args)
