@@ -29,7 +29,7 @@ module Resque
       def around_perform_retrieve_priority(*args)
         key = priority_key(*args)
         priority = Resque.redis.get(key)
-        self.priority = priority && priority.empty? ? :normal : priority
+        self.priority = priority.blank? ? :normal : priority
 
         begin
           yield
